@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LiveSplit to YouTube Chapters</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen p-6">
+  <div class="max-w-6xl mx-auto">
+    <div class="mb-8">
+      <h1 class="text-4xl font-bold mb-3">LiveSplit → YouTube Chapters</h1>
+      <p class="text-slate-400 leading-relaxed max-w-3xl">
+        Upload a LiveSplit <strong>.lss</strong> file, choose which split timing set to use,
+        and generate formatted YouTube chapters for your video description.
+        Everything runs entirely in your browser.
+      </p>
+    </div>
+
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-6 shadow-2xl">
+      <label for="fileInput" class="block font-semibold mb-3 text-lg">Upload LiveSplit File</label>
+      <input type="file" id="fileInput" accept=".lss,.xml"
+        class="block w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-slate-100 file:mr-4 file:rounded-lg file:border-0 file:bg-blue-600 file:px-4 file:py-2 file:font-semibold file:text-white hover:file:bg-blue-500" />
+    </div>
+
+    <div id="controls" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-6 shadow-2xl">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div>
+          <label for="attemptSelect" class="block font-semibold mb-2">Split Timing Source</label>
+          <select id="attemptSelect" class="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-slate-100"></select>
+        </div>
+
+        <div>
+          <label for="startLabel" class="block font-semibold mb-2">Starting Chapter Name</label>
+          <input type="text" id="startLabel" value="Start"
+            class="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-slate-100" />
+        </div>
+      </div>
+
+      <div class="mt-6 flex flex-wrap gap-3">
+        <button id="generateBtn"
+          class="rounded-xl bg-blue-600 px-5 py-3 font-semibold transition hover:bg-blue-500">
+          Generate YouTube Chapters
+        </button>
+        <button id="copyBtn"
+          class="rounded-xl bg-slate-700 px-5 py-3 font-semibold transition hover:bg-slate-600">
+          Copy Output
+        </button>
+      </div>
+    </div>
+
+    <div id="previewCard" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-6 shadow-2xl">
+      <h2 class="text-2xl font-bold mb-4">Segment Preview</h2>
+      <div id="segmentPreview" class="max-h-96 overflow-y-auto rounded-xl border border-slate-800 bg-slate-950 p-4 font-mono text-sm"></div>
+    </div>
+
+    <div id="outputCard" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl">
+      <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+        <h2 class="text-2xl font-bold">YouTube Chapters</h2>
+        <span id="copyStatus" class="hidden font-semibold text-emerald-400">Copied!</span>
+      </div>
+
+      <textarea id="output" readonly
+        class="min-h-\[320px\] w-full rounded-xl border border-slate-800 bg-slate-950 p-4 font-mono text-sm text-slate-100"></textarea>
+
+      <div class="mt-4 text-sm text-slate-400">
+        YouTube requires the first chapter to start at <strong>0:00</strong> and recommends at least 3 chapters.
+      </div>
+    </div>
+  </div>
+  
+</body>
+</html>
