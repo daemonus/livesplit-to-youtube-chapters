@@ -25,7 +25,7 @@
     </div>
 
     <div id="controls" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-6 shadow-2xl">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
         <div>
           <label for="attemptSelect" class="block font-semibold mb-2">Split Timing Source</label>
           <select id="attemptSelect" class="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-slate-100"></select>
@@ -36,36 +36,41 @@
           <input type="text" id="startLabel" value="Start"
             class="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-slate-100" />
         </div>
+
+        <div class="flex items-end">
+          <label class="inline-flex items-center gap-3 cursor-pointer select-none rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 w-full">
+            <input type="checkbox" id="hideDnf" class="accent-blue-500 w-5 h-5" />
+            <span class="font-semibold">Hide DNF Runs</span>
+          </label>
+        </div>
       </div>
 
-      <div class="mt-6 flex flex-wrap gap-3">
-        <button id="generateBtn"
-          class="rounded-xl bg-blue-600 px-5 py-3 font-semibold transition hover:bg-blue-500">
-          Generate YouTube Chapters
-        </button>
-        <button id="copyBtn"
-          class="rounded-xl bg-slate-700 px-5 py-3 font-semibold transition hover:bg-slate-600">
-          Copy Output
-        </button>
-      </div>
     </div>
 
-    <div id="previewCard" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-6 shadow-2xl">
-      <h2 class="text-2xl font-bold mb-4">Segment Preview</h2>
-      <div id="segmentPreview" class="max-h-96 overflow-y-auto rounded-xl border border-slate-800 bg-slate-950 p-4 font-mono text-sm"></div>
-    </div>
-
-    <div id="outputCard" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl">
-      <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
-        <h2 class="text-2xl font-bold">YouTube Chapters</h2>
-        <span id="copyStatus" class="hidden font-semibold text-emerald-400">Copied!</span>
+    <div id="resultsRow" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div id="previewCard" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl">
+        <h2 class="text-2xl font-bold mb-4">Segment Preview</h2>
+        <div id="segmentPreview" class="rounded-xl border border-slate-800 bg-slate-950 p-4 font-mono text-sm"></div>
       </div>
 
-      <textarea id="output" readonly
-        class="min-h-\[320px\] w-full rounded-xl border border-slate-800 bg-slate-950 p-4 font-mono text-sm text-slate-100"></textarea>
+      <div id="outputCard" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+          <h2 class="text-2xl font-bold">YouTube Chapters</h2>
+          <div class="flex items-center gap-3">
+            <span id="copyStatus" class="hidden font-semibold text-emerald-400">Copied!</span>
+            <button id="copyBtn"
+              class="rounded-xl bg-slate-700 px-4 py-2 text-sm font-semibold transition hover:bg-slate-600">
+              Copy Output
+            </button>
+          </div>
+        </div>
 
-      <div class="mt-4 text-sm text-slate-400">
-        YouTube requires the first chapter to start at <strong>0:00</strong> and recommends at least 3 chapters.
+        <textarea id="output" readonly
+          class="w-full rounded-xl border border-slate-800 bg-slate-950 p-4 font-mono text-sm text-slate-100 resize-none overflow-hidden"></textarea>
+
+        <div class="mt-4 text-sm text-slate-400">
+          YouTube requires the first chapter to start at <strong>0:00</strong> and recommends at least 3 chapters.
+        </div>
       </div>
     </div>
   </div>

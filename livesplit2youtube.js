@@ -2,15 +2,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const fileInput = document.getElementById('fileInput');
     const controls = document.getElementById('controls');
-    const previewCard = document.getElementById('previewCard');
-    const outputCard = document.getElementById('outputCard');
+    const resultsRow = document.getElementById('resultsRow');
     const attemptSelect = document.getElementById('attemptSelect');
-    const generateBtn = document.getElementById('generateBtn');
     const output = document.getElementById('output');
     const copyBtn = document.getElementById('copyBtn');
     const copyStatus = document.getElementById('copyStatus');
     const segmentPreview = document.getElementById('segmentPreview');
     const startLabelInput = document.getElementById('startLabel');
+    const hideDnfCheckbox = document.getElementById('hideDnf');
 
     let parsedData = null;
 
@@ -28,7 +27,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    generateBtn.addEventListener('click', generateChapters);
+    attemptSelect.addEventListener('change', generateChapters);
+    startLabelInput.addEventListener('input', generateChapters);
+
+    hideDnfCheckbox.addEventListener('change', () => {
+        if (parsedData) {
+            populateAttemptOptions();
+            generateChapters();
+        }
+    });
 
     copyBtn.addEventListener('click', async () => {
         if (!output.value.trim()) {
@@ -67,13 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const splitSets = [];
 
-        // Personal Best from split times
-        splitSets.push({
-            id: 'pb',
-            label: 'Personal Best Splits',
-            cumulativeTimes: extractSegmentSplitTimes(segments)
-        });
-
         // Attempt history runs
         attempts.forEach((attempt, index) => {
             const id = attempt.getAttribute('id') || String(index + 1);
@@ -82,13 +82,32 @@ document.addEventListener('DOMContentLoaded', () => {
             const cumulativeTimes = extractAttemptTimes(segments, id);
 
             if (cumulativeTimes.some(t => t !== null)) {
+                const isDNF = cumulativeTimes[cumulativeTimes.length - 1] === null;
                 splitSets.push({
                     id,
                     label: `Attempt ${id}${realTime ? ` (${new Date(realTime).toLocaleDateString()})` : ''}`,
-                    cumulativeTimes
+                    cumulativeTimes,
+                    isPB: false,
+                    isDNF
                 });
             }
         });
+
+        // Mark the fastest completed run as PB
+        let bestIndex = -1;
+        let bestTime = Infinity;
+        splitSets.forEach((set, index) => {
+            if (set.isDNF) return;
+            const validTimes = set.cumulativeTimes.filter(t => t !== null && t !== undefined);
+            const finalTime = validTimes.length ? validTimes[validTimes.length - 1] : null;
+            if (finalTime !== null && finalTime < bestTime) {
+                bestTime = finalTime;
+                bestIndex = index;
+            }
+        });
+        if (bestIndex >= 0) {
+            splitSets[bestIndex].isPB = true;
+        }
 
         parsedData = {
             segments: segments.map(seg => seg.querySelector('Name')?.textContent?.trim() || 'Unnamed Segment'),
@@ -98,20 +117,9 @@ document.addEventListener('DOMContentLoaded', () => {
         populateAttemptOptions();
 
         controls.classList.remove('hidden');
-        previewCard.classList.remove('hidden');
-        outputCard.classList.remove('hidden');
+        resultsRow.classList.remove('hidden');
 
         generateChapters();
-    }
-
-    function extractSegmentSplitTimes(segments) {
-        return segments.map(segment => {
-            const splitTime = segment.querySelector('SplitTimes > SplitTime[name="Personal Best"] > RealTime');
-            if (!splitTime || !splitTime.textContent) {
-                 return null;
-            }
-            return parseLiveSplitDuration(splitTime.textContent.trim());
-        });
     }
 
     function extractAttemptTimes(segments, attemptId) {
@@ -139,28 +147,46 @@ document.addEventListener('DOMContentLoaded', () => {
             return acc;
         }, []);
     }
+
     function populateAttemptOptions() {
+        const previousValue = attemptSelect.value;
         attemptSelect.innerHTML = '';
-      
+
         parsedData.splitSets.forEach((set, index) => {
-          // find last valid time in run
-          const validTimes = set.cumulativeTimes.filter(t => t !== null && t !== undefined);
-      
-          const totalTime = validTimes.length
-            ? validTimes[validTimes.length - 1]
-            : null;
-      
-          const timeText = totalTime !== null
-            ? ` — ${formatDuration(totalTime)}`
-            : ' — N/A';
-      
-          const option = document.createElement('option');
-          option.value = index;
-          option.textContent = `${set.label}${timeText}`;
-      
-          attemptSelect.appendChild(option);
+            if (hideDnfCheckbox.checked && set.isDNF) return;
+
+            const validTimes = set.cumulativeTimes.filter(t => t !== null && t !== undefined);
+
+            const totalTime = validTimes.length
+                ? validTimes[validTimes.length - 1]
+                : null;
+
+            const timeText = totalTime !== null
+                ? ' - ' + formatDuration(totalTime)
+                : ' - N/A';
+
+            let statusIcon;
+            if (set.isPB) {
+                statusIcon = '\uD83C\uDFC6';
+            } else if (set.isDNF) {
+                statusIcon = '\u2717';
+            } else {
+                statusIcon = '\u2713';
+            }
+
+            const option = document.createElement('option');
+            option.value = index;
+            option.textContent = statusIcon + ' ' + set.label + timeText;
+
+            attemptSelect.appendChild(option);
         });
-      }
+
+        // restore previous selection if still available
+        const options = [...attemptSelect.options];
+        if (options.some(o => o.value === previousValue)) {
+            attemptSelect.value = previousValue;
+        }
+    }
 
     function generateChapters() {
         if (!parsedData){
@@ -177,9 +203,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const startLabel = startLabelInput.value.trim() || 'Start';
 
-        lines.push(`0:00 ${startLabel}`);
+        lines.push('0:00 ' + startLabel);
 
-        previewLines.push(`<div><strong>0:00</strong> — ${escapeHtml(startLabel)}</div>`);
+        previewLines.push('<div><strong>0:00</strong> - ' + escapeHtml(startLabel) + '</div>');
 
         parsedData.segments.forEach((segmentName, index) => {
             const totalSeconds = selectedSet.cumulativeTimes[index];
@@ -190,15 +216,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const timestamp = formatYouTubeTimestamp(totalSeconds);
 
-            lines.push(`${timestamp} ${segmentName}`);
+            lines.push(timestamp + ' ' + segmentName);
 
             previewLines.push(
-                `<div><strong>${escapeHtml(timestamp)}</strong> — ${escapeHtml(segmentName)}</div>`
+                '<div><strong>' + escapeHtml(timestamp) + '</strong> - ' + escapeHtml(segmentName) + '</div>'
             );
         });
 
         output.value = lines.join('\n');
         segmentPreview.innerHTML = previewLines.join('');
+
+        // auto-size textarea to fit content
+        output.style.height = 'auto';
+        output.style.height = output.scrollHeight + 'px';
     }
 
     function parseLiveSplitDuration(duration) {
@@ -224,10 +254,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const seconds = totalSeconds % 60;
 
         if (hours > 0) {
-            return `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            return hours + ':' + String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
         }
 
-        return `${minutes}:${String(seconds).padStart(2, '0')}`;
+        return minutes + ':' + String(seconds).padStart(2, '0');
     }
 
     function escapeHtml(str) {
@@ -247,9 +277,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const seconds = totalSeconds % 60;
 
         if (hours > 0) {
-            return `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            return hours + ':' + String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
         }
 
-        return `${minutes}:${String(seconds).padStart(2, '0')}`;
+        return minutes + ':' + String(seconds).padStart(2, '0');
     }
 });
