@@ -2,6 +2,7 @@
 Allows uploading [LiveSplit](https://livesplit.org/) .LSS files and converting them into chapters for a YouTube video description
 
 All processing happens inside your browser, no data is sent off the machine.
+[Open LiveSplit2YouTube](https://budditec.nz/livesplit-to-youtube-chapters/)
 
 ## Usage
 
