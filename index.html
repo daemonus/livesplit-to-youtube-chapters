@@ -43,7 +43,7 @@
     </div>
 
     <div id="optionsPanel" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-6 shadow-2xl">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
         <div>
           <label for="startLabel" class="block font-semibold mb-2">Starting Chapter Name</label>
           <input type="text" id="startLabel" value="Start"
@@ -54,6 +54,13 @@
           <label for="offsetInput" class="block font-semibold mb-2">Chapter Offset (seconds)</label>
           <input type="number" id="offsetInput" value="0" min="0" step="1"
             class="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-slate-100" />
+        </div>
+
+        <div class="flex items-end">
+          <label class="inline-flex items-center gap-3 cursor-pointer select-none rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 w-full">
+            <input type="checkbox" id="showAttribution" class="accent-blue-500 w-5 h-5" />
+            <span class="font-semibold">Show Attribution</span>
+          </label>
         </div>
       </div>
     </div>

@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const startLabelInput = document.getElementById('startLabel');
     const hideDnfCheckbox = document.getElementById('hideDnf');
     const offsetInput = document.getElementById('offsetInput');
+    const showAttributionCheckbox = document.getElementById('showAttribution');
 
     let parsedData = null;
 
@@ -38,6 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     startLabelInput.addEventListener('input', generateChapters);
     offsetInput.addEventListener('input', generateChapters);
+    showAttributionCheckbox.addEventListener('change', generateChapters);
 
     hideDnfCheckbox.addEventListener('change', () => {
         if (parsedData) {
@@ -241,6 +243,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 '<div><strong>' + escapeHtml(previewTimestamp) + '</strong> - ' + escapeHtml(segmentName) + '</div>'
             );
         });
+
+        if (showAttributionCheckbox.checked) {
+            lines.push('');
+            lines.push('');
+            lines.push('Chapters generated with https://budditec.nz/livesplit-to-youtube-chapters/');
+        }
 
         output.value = lines.join('\n');
         segmentPreview.innerHTML = previewLines.join('');
