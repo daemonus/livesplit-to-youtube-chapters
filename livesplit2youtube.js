@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const fileInput = document.getElementById('fileInput');
     const controls = document.getElementById('controls');
+    const optionsPanel = document.getElementById('optionsPanel');
     const resultsRow = document.getElementById('resultsRow');
     const attemptSelect = document.getElementById('attemptSelect');
     const output = document.getElementById('output');
@@ -28,7 +29,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    attemptSelect.addEventListener('change', generateChapters);
+    attemptSelect.addEventListener('change', () => {
+        if (attemptSelect.value) {
+            optionsPanel.classList.remove('hidden');
+            resultsRow.classList.remove('hidden');
+            generateChapters();
+        }
+    });
     startLabelInput.addEventListener('input', generateChapters);
     offsetInput.addEventListener('input', generateChapters);
 
@@ -119,9 +126,8 @@ document.addEventListener('DOMContentLoaded', () => {
         populateAttemptOptions();
 
         controls.classList.remove('hidden');
-        resultsRow.classList.remove('hidden');
-
-        generateChapters();
+        optionsPanel.classList.add('hidden');
+        resultsRow.classList.add('hidden');
     }
 
     function extractAttemptTimes(segments, attemptId) {
@@ -153,6 +159,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function populateAttemptOptions() {
         const previousValue = attemptSelect.value;
         attemptSelect.innerHTML = '';
+
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = 'Select a run...';
+        placeholder.disabled = true;
+        if (!previousValue) placeholder.selected = true;
+        attemptSelect.appendChild(placeholder);
 
         parsedData.splitSets.forEach((set, index) => {
             if (hideDnfCheckbox.checked && set.isDNF) return;
