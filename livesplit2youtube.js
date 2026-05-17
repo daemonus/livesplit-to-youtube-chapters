@@ -169,6 +169,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!previousValue) placeholder.selected = true;
         attemptSelect.appendChild(placeholder);
 
+        const allDnf = parsedData.splitSets.every(set => set.isDNF);
+        if (allDnf && hideDnfCheckbox.checked) {
+            hideDnfCheckbox.checked = false;
+        }
+
         parsedData.splitSets.forEach((set, index) => {
             if (hideDnfCheckbox.checked && set.isDNF) return;
 
@@ -222,22 +227,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const offset = parseFloat(offsetInput.value) || 0;
 
-        lines.push('0:00 ' + startLabel);
-
-        previewLines.push('<div><strong>00:00:00.000</strong> - ' + escapeHtml(startLabel) + '</div>');
+        if (offset > 0) {
+            lines.push('0:00 ' + startLabel);
+            previewLines.push('<div><strong>00:00:00.000</strong> - ' + escapeHtml(startLabel) + '</div>');
+        }
 
         parsedData.segments.forEach((segmentName, index) => {
-            const totalSeconds = selectedSet.cumulativeTimes[index];
+            const startOfSection = index === 0
+                ? 0
+                : selectedSet.cumulativeTimes[index - 1];
 
-            if (totalSeconds === null || totalSeconds === undefined) {
+            if (startOfSection === null || startOfSection === undefined) {
                 return;
             }
 
-            const timestamp = formatYouTubeTimestamp(totalSeconds + offset);
+            const timestamp = formatYouTubeTimestamp(startOfSection + offset);
 
             lines.push(timestamp + ' ' + segmentName);
 
-            const previewTimestamp = formatDuration(totalSeconds);
+            const previewTimestamp = formatDuration(startOfSection);
 
             previewLines.push(
                 '<div><strong>' + escapeHtml(previewTimestamp) + '</strong> - ' + escapeHtml(segmentName) + '</div>'
