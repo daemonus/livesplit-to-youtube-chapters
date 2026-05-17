@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const segmentPreview = document.getElementById('segmentPreview');
     const startLabelInput = document.getElementById('startLabel');
     const hideDnfCheckbox = document.getElementById('hideDnf');
+    const offsetInput = document.getElementById('offsetInput');
 
     let parsedData = null;
 
@@ -29,6 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     attemptSelect.addEventListener('change', generateChapters);
     startLabelInput.addEventListener('input', generateChapters);
+    offsetInput.addEventListener('input', generateChapters);
 
     hideDnfCheckbox.addEventListener('change', () => {
         if (parsedData) {
@@ -203,6 +205,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const startLabel = startLabelInput.value.trim() || 'Start';
 
+        const offset = parseFloat(offsetInput.value) || 0;
+
         lines.push('0:00 ' + startLabel);
 
         previewLines.push('<div><strong>00:00:00.000</strong> - ' + escapeHtml(startLabel) + '</div>');
@@ -214,7 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            const timestamp = formatYouTubeTimestamp(totalSeconds);
+            const timestamp = formatYouTubeTimestamp(totalSeconds + offset);
 
             lines.push(timestamp + ' ' + segmentName);
 
