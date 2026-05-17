@@ -205,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         lines.push('0:00 ' + startLabel);
 
-        previewLines.push('<div><strong>0:00</strong> - ' + escapeHtml(startLabel) + '</div>');
+        previewLines.push('<div><strong>00:00:00.000</strong> - ' + escapeHtml(startLabel) + '</div>');
 
         parsedData.segments.forEach((segmentName, index) => {
             const totalSeconds = selectedSet.cumulativeTimes[index];
@@ -218,8 +218,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             lines.push(timestamp + ' ' + segmentName);
 
+            const previewTimestamp = formatDuration(totalSeconds);
+
             previewLines.push(
-                '<div><strong>' + escapeHtml(timestamp) + '</strong> - ' + escapeHtml(segmentName) + '</div>'
+                '<div><strong>' + escapeHtml(previewTimestamp) + '</strong> - ' + escapeHtml(segmentName) + '</div>'
             );
         });
 
@@ -243,7 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const minutes = parseInt(parts[1], 10) || 0;
         const seconds = parseFloat(parts[2]) || 0;
 
-        return Math.floor((hours * 3600) + (minutes * 60) + seconds);
+        return (hours * 3600) + (minutes * 60) + seconds;
     }
 
     function formatYouTubeTimestamp(totalSeconds) {
@@ -270,16 +272,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function formatDuration(totalSeconds) {
-        totalSeconds = Math.max(0, Math.floor(totalSeconds));
+        totalSeconds = Math.max(0, totalSeconds);
 
         const hours = Math.floor(totalSeconds / 3600);
         const minutes = Math.floor((totalSeconds % 3600) / 60);
-        const seconds = totalSeconds % 60;
+        const secs = Math.floor(totalSeconds % 60);
+        const ms = Math.floor((totalSeconds % 1) * 1000);
 
-        if (hours > 0) {
-            return hours + ':' + String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
-        }
-
-        return minutes + ':' + String(seconds).padStart(2, '0');
+        return String(hours).padStart(2, '0') + ':' +
+               String(minutes).padStart(2, '0') + ':' +
+               String(secs).padStart(2, '0') + '.' +
+               String(ms).padStart(3, '0');
     }
 });
