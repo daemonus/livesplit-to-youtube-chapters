@@ -1,4 +1,4 @@
-# HellfireStudios.LiveSplitToYoutubeChapters
+# LiveSplit To Youtube Chapters
 Allows uploading [LiveSplit](https://livesplit.org/) .LSS files and converting them into chapters for a YouTube video description
 
 All processing happens inside your browser, no data is sent off the machine.
